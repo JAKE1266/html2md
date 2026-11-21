@@ -1,5 +1,11 @@
 # html2md
 
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-38%20passing-success)
+![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
+
 HTML 转 Markdown —— 只用标准库 `html.parser` 实现的流式转换器，为「把网页内容收进 Markdown 笔记库」而生。
 
 - **块级**：一~六级标题、段落、分隔线、引用（多层嵌套 `>`）、`br` 换行
@@ -92,6 +98,19 @@ convert('<a href="/p/1">文</a>', base_url="https://a.com/blog/")
 ```bash
 python -m unittest discover -s tests
 # Ran 38 tests ... OK
+```
+
+
+## 📁 项目结构
+
+```
+html2md/
+├── LICENSE
+├── html2md/
+├── pyproject.toml
+├── samples/
+├── tests/
+└── README.md
 ```
 
 ## License
