@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "html2md"
+version = "0.1.0"
+description = "零依赖 HTML 转 Markdown：标题/列表/引用/表格/代码围栏，相对链接自动补全"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["html", "markdown", "converter", "网页转markdown"]
+
+[project.scripts]
+html2md = "html2md.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["html2md*"]

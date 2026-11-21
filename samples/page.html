@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>探索中文内容工具箱</title>
+  <style>body { font-family: sans-serif; }</style>
+</head>
+<body>
+  <nav><a href="/home">首页</a> · <a href="/tags">标签</a></nav>
+  <article>
+    <h1>探索中文内容工具箱</h1>
+    <p>这是一篇演示文章，讲的是 <strong>开源</strong> 与 <em>写作</em> 的关系，
+       以及 <code>markdown</code> 在内容流水线中的位置。</p>
+    <h2>为什么做小工具</h2>
+    <ul>
+      <li>小而美，容易维护</li>
+      <li>零依赖，装完即用</li>
+      <li>测试齐全，改起来放心</li>
+    </ul>
+    <h2>延伸阅读</h2>
+    <ol>
+      <li>先读 <a href="open-source.html">开源项目集总览</a></li>
+      <li>再看 <a href="https://example.com/guide">外部指南</a></li>
+    </ol>
+    <blockquote><p>工具是思想的放大器。</p></blockquote>
+    <pre><code>pip install html2md
+python -m html2md page.html -o page.md</code></pre>
+    <table>
+      <tr><th>模块</th><th>职责</th></tr>
+      <tr><td>parser</td><td>流式解析 HTML</td></tr>
+      <tr><td>render</td><td>输出 Markdown</td></tr>
+    </table>
+    <p>完。</p>
+  </article>
+  <aside>aside 内容也会保留（除非显式剥离）</aside>
+  <script>console.log("should be stripped");</script>
+</body>
+</html>
