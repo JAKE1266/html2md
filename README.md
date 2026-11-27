@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Tests](https://img.shields.io/badge/tests-38%20passing-success)
+![Tests](https://img.shields.io/badge/tests-46%20passing-success)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
 
@@ -22,9 +22,11 @@ HTML 转 Markdown —— 只用标准库 `html.parser` 实现的流式转换器�
 ## 安装
 
 ```bash
-pip install .      # 获得 html2md 命令
-python -m html2md --help    # 或免安装运行
+pip install html2md-kit
+python -m html2md --help
 ```
+
+也可执行 `pip install .` 从源码安装。PyPI 发行名为 `html2md-kit`，Python 模块名与 CLI 命令仍为 `html2md`。
 
 ## 真实运行示例
 
@@ -56,15 +58,18 @@ $ python -m html2md samples/page.html --base-url https://blog.example.com/posts/
 > 工具是思想的放大器。
 
 ```
-pip install html2md
+
+安装发布版并转换文件：
+
+```bash
+pip install html2md-kit
 python -m html2md page.html -o page.md
 ```
 
 | 模块 | 职责 |
 | --- | --- |
-| parser | 流式解析 HTML |
-| render | 输出 Markdown |
-```
+| `html2md/core.py` | 流式解析 HTML 并渲染 Markdown |
+| `html2md/__main__.py` | 命令行入口与 UTF-8 输入输出 |
 
 管道模式与自定义剥离：
 
@@ -77,8 +82,8 @@ $ cat page.html | python -m html2md - --strip script,style
 ```python
 from html2md import convert
 
-convert("<h1>标题</h1><p>正文 <b>加粗</b>。</p>")
-# '# 标题\n\n正文 **加粗**。\n'
+convert("<h1>标题 <strong>重点</strong></h1><p>正文 <b>加粗</b>。</p>")
+# '# 标题 **重点**\n\n正文 **加粗**。\n'
 
 convert('<a href="/p/1">文</a>', base_url="https://a.com/blog/")
 # '[文](https://a.com/p/1)\n'
@@ -97,15 +102,18 @@ convert('<a href="/p/1">文</a>', base_url="https://a.com/blog/")
 
 ```bash
 python -m unittest discover -s tests
-# Ran 38 tests ... OK
+# Ran 46 tests ... OK
 ```
 
 
-## 📁 项目结构
+## 项目结构
 
 ```
 html2md/
+├── .github/
+├── CHANGELOG.md
 ├── LICENSE
+├── MANIFEST.in
 ├── html2md/
 ├── pyproject.toml
 ├── samples/

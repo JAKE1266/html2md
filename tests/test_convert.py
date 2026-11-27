@@ -8,6 +8,31 @@ class TestHeadingsAndParagraphs(unittest.TestCase):
         md = convert("<h1>大标题</h1><h2>小节</h2><h6>深层</h6>")
         self.assertEqual(md, "# 大标题\n\n## 小节\n\n###### 深层\n")
 
+    def test_inline_marks_stay_in_heading(self):
+        md = convert("<h1>Hello <strong>world</strong></h1>")
+        self.assertEqual(md, "# Hello **world**\n")
+
+    def test_nested_inline_marks_stay_in_heading(self):
+        md = convert("<h2>A <strong>B <em>C</em></strong> <code>D</code> <del>E</del></h2>")
+        self.assertEqual(md, "## A **B *C*** `D` ~~E~~\n")
+
+    def test_heading_link_and_image(self):
+        md = convert('<h3><a href="/g">阅读 <em>[指南]</em></a> '
+                     '<img src="/i.png" alt="图"></h3>', base_url="https://a.com/")
+        self.assertEqual(md, "### [阅读 *\\[指南\\]*](https://a.com/g) ![图](https://a.com/i.png)\n")
+
+    def test_heading_followed_by_paragraph(self):
+        self.assertEqual(convert("<h1>标题</h1><p>正文</p>"), "# 标题\n\n正文\n")
+
+    def test_unclosed_heading_ends_at_next_block(self):
+        self.assertEqual(convert("<h1>标题<p>正文</p>"), "# 标题\n\n正文\n")
+
+    def test_unclosed_heading_ends_at_container_start(self):
+        for tag in ("div", "section", "article", "header", "footer"):
+            with self.subTest(tag=tag):
+                self.assertEqual(convert(f"<h1>标题<{tag}>正文</{tag}>"),
+                                 "# 标题\n\n正文\n")
+
     def test_paragraphs_split(self):
         md = convert("<p>第一段</p><p>第二段</p>")
         self.assertEqual(md, "第一段\n\n第二段\n")

@@ -13,7 +13,8 @@ from urllib.parse import urljoin
 DEFAULT_STRIP = ("script", "style", "head", "title", "nav", "aside", "noscript", "template")
 _BLOCK_TAGS = {"p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
                "blockquote", "pre", "hr", "table", "tr", "div", "section",
-               "article", "main", "figure", "figcaption", "dl", "dt", "dd"}
+               "article", "main", "figure", "figcaption", "dl", "dt", "dd",
+               "header", "footer"}
 
 _HEADING = {"h1": "#", "h2": "##", "h3": "###", "h4": "####", "h5": "#####", "h6": "######"}
 _INLINE_WRAP = {"strong": "**", "b": "**", "em": "*", "i": "*", "del": "~~", "s": "~~",
@@ -78,6 +79,7 @@ class Converter(HTMLParser):
         self._push_block(text, merge=mark0 is not None and len(self.out) > mark0)
 
     def _finish_block(self) -> None:
+        self.heading_tag = None
         self._push_block(self._flush_inline())
 
     @staticmethod
@@ -120,6 +122,9 @@ class Converter(HTMLParser):
         if self.pre_depth and tag != "pre":
             return  # pre 内不解析任何行内/块结构
 
+        if self.heading_tag and tag in _BLOCK_TAGS:
+            self._finish_block()
+
         if tag in _HEADING:
             self._finish_block()
             self.inline = _HEADING[tag] + " "
@@ -132,10 +137,8 @@ class Converter(HTMLParser):
             self._finish_block()
             self._push_block("---")
         elif tag in _INLINE_WRAP:
-            self._finish_block_if_heading()
             self.inline += _INLINE_WRAP[tag]
         elif tag == "a":
-            self._finish_block_if_heading()
             href = attrs_d.get("href") or ""
             if href and self.base_url:
                 href = urljoin(self.base_url, href)
@@ -182,15 +185,9 @@ class Converter(HTMLParser):
             self.cell = _Cell()
             self.cell.header = tag == "th"
 
-    def _finish_block_if_heading(self) -> None:
-        if self.heading_tag:
-            self._close_heading()
-
     def _close_heading(self) -> None:
-        tag = self.heading_tag
         self.heading_tag = None
-        text = self._flush_inline()
-        self._push_block(text)
+        self._push_block(self._flush_inline())
 
     def handle_endtag(self, tag: str) -> None:  # noqa: C901
         if self.strip_depth:

@@ -6,21 +6,49 @@ on:
   pull_request:
 
 jobs:
+  build:
+    name: 构建发行包
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 安装构建工具
+        run: python -m pip install build twine
+      - name: 构建 wheel 与 sdist
+        run: python -m build
+      - name: 检查发行包元数据
+        run: python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: dist/*
+          if-no-files-found: error
+
   test:
     name: 测试 (${{ matrix.os }}, Python ${{ matrix.python }})
+    needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.9", "3.11", "3.13"]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel]
+        python: ["3.8", "3.9", "3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: 运行单元测试
-        env:
-          PYTHONIOENCODING: utf-8
-          PYTHONUTF8: "1"
-        run: python -m unittest discover -s tests -v
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: dist
+      - name: 安装真实 wheel
+        run: python -m pip install dist/html2md_kit-0.1.1-py3-none-any.whl
+      - name: 验证已安装发行包
+        working-directory: ${{ runner.temp }}
+        run: python "$GITHUB_WORKSPACE/tests/smoke_installed.py"
+      - name: 在源码目录外运行单元测试
+        working-directory: ${{ runner.temp }}
+        run: python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v

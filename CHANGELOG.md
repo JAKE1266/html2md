@@ -3,6 +3,22 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 格式,
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.1] - 2026-11-27
+
+### 修复
+- 标题中的粗体、斜体、代码、删除线、链接与图片保留在同一标题行
+- 未闭合标题在下一个块级元素开始时正确收尾
+- Windows 默认编码下 CLI 的 UTF-8 标准输入、输出与错误流
+
+### 变更
+- PyPI 发行名改为 `html2md-kit`，Python 模块名与 `html2md` 命令保持不变
+- CI 增加 wheel/sdist 构建、元数据检查与真实安装冒烟，覆盖三系统 × 四个 Python 版本
+- Ubuntu 固定为 22.04，macOS 使用 Intel runner，兼容 Python 3.8/3.9
+
+### 新增
+- 6 个标题回归用例与 2 个 CLI 编码/版本用例，共 46 个单元测试
+- sdist 清单与已安装发行包冒烟脚本
+
 ## [0.1.0] - 2026-11-21
 
 ### 新增

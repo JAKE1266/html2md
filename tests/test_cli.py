@@ -1,21 +1,32 @@
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable
 
-SAMPLE = ROOT / "samples" / "page.html"
+SAMPLE = Path(__file__).resolve().parent.parent / "samples" / "page.html"
 
 
 def run_cli(*args, stdin_text=None, expect=0):
     r = subprocess.run([PY, "-m", "html2md", *args], input=stdin_text,
-                       capture_output=True, text=True, encoding="utf-8", cwd=ROOT)
+                       capture_output=True, text=True, encoding="utf-8")
     if r.returncode != expect:
         raise AssertionError(f"exit={r.returncode} (expect {expect})\n"
                              f"stdout={r.stdout}\nstderr={r.stderr}")
+    return r
+
+
+def run_cli_bytes(*args, stdin_bytes=b"", expect=0):
+    env = os.environ.copy()
+    env.update(PYTHONIOENCODING="cp1252", PYTHONUTF8="0")
+    r = subprocess.run([PY, "-m", "html2md", *args], input=stdin_bytes,
+                       capture_output=True, env=env)
+    if r.returncode != expect:
+        raise AssertionError(f"exit={r.returncode} (expect {expect})\n"
+                             f"stdout={r.stdout!r}\nstderr={r.stderr!r}")
     return r
 
 
@@ -50,6 +61,19 @@ class TestCli(unittest.TestCase):
     def test_missing_file(self):
         r = run_cli("nope.html", expect=1)
         self.assertIn("文件不存在", r.stderr)
+
+    def test_utf8_bytes_pipe_and_error_under_legacy_encoding(self):
+        source = "<h1>中文 <strong>标题</strong></h1><p>正文</p>".encode("utf-8")
+        r = run_cli_bytes("-", stdin_bytes=source)
+        stdout = r.stdout.decode("utf-8").replace("\r\n", "\n")
+        self.assertEqual(stdout, "# 中文 **标题**\n\n正文\n")
+
+        r = run_cli_bytes("nope.html", expect=1)
+        self.assertIn("文件不存在", r.stderr.decode("utf-8"))
+
+    def test_version(self):
+        r = run_cli("--version")
+        self.assertEqual(r.stdout.strip(), "html2md 0.1.1")
 
 
 if __name__ == "__main__":
