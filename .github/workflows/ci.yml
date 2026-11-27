@@ -48,7 +48,7 @@ jobs:
         run: python -m pip install dist/html2md_kit-0.1.1-py3-none-any.whl
       - name: 验证已安装发行包
         working-directory: ${{ runner.temp }}
-        run: python "$GITHUB_WORKSPACE/tests/smoke_installed.py"
+        run: python -c "import os, runpy; runpy.run_path(os.path.join(os.environ['GITHUB_WORKSPACE'], 'tests', 'smoke_installed.py'), run_name='__main__')"
       - name: 在源码目录外运行单元测试
         working-directory: ${{ runner.temp }}
-        run: python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v
+        run: python -c "import os, unittest; suite = unittest.defaultTestLoader.discover(os.path.join(os.environ['GITHUB_WORKSPACE'], 'tests')); result = unittest.TextTestRunner(verbosity=2).run(suite); raise SystemExit(0 if result.wasSuccessful() else 1)"
